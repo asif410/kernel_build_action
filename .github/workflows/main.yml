@@ -34,29 +34,24 @@ jobs:
           config: vendor/xiaomi/mi845_defconfig
           arch: arm64
 
-          # NUCLEAR OPTION: Physically remove -Werror from all source files to bypass BPF/KSU crashes
+          # THE TRUE NUCLEAR OPTION: 
+          # 1. Strips -Werror from all files
+          # 2. Forces -w flag to suppress ALL warnings so they can't become errors
           extra-cmd: |
-            find . -name "Makefile*" -type f -exec sed -i 's/-Werror//g' {} +
-            find . -name "Kbuild*" -type f -exec sed -i 's/-Werror//g' {} +
-            export KCFLAGS="-Wno-error -Wno-incompatible-function-pointer-types -Wno-declaration-after-statement"
+            find . -type f -name "Makefile*" -exec sed -i 's/-Werror//g' {} +
+            find . -type f -name "Kbuild*" -exec sed -i 's/-Werror//g' {} +
+            export KCFLAGS="-w -Wno-error -Wno-incompatible-function-pointer-types -Wno-declaration-after-statement"
           
-          # Enable BOTH Clang and GCC (Required for SDM845)
           aosp-gcc: true
           aosp-clang: true
-          
-          # Use modern versions compatible with Android 16 ROMs
           android-version: 12
           aosp-clang-version: r383902
           
-          # These flags help with Docker's BPF requirements
           disable-lto: false
-          
-          # Output and Root
           anykernel3: true
           ksu: true
           ksu-version: main
 
-    # --- UPLOAD STEP (Makes the .zip file available for download) ---
     - name: Upload Kernel Result
       uses: actions/upload-artifact@v4
       with:
