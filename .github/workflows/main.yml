@@ -37,10 +37,9 @@ jobs:
           # THE TRUE NUCLEAR OPTION: 
           # 1. Strips -Werror from all files
           # 2. Forces -w flag to suppress ALL warnings so they can't become errors
+          # We fixed the source code, so we just need basic flags here
           extra-cmd: |
-            find . -type f -name "Makefile*" -exec sed -i 's/-Werror//g' {} +
-            find . -type f -name "Kbuild*" -exec sed -i 's/-Werror//g' {} +
-            export KCFLAGS="-w -Wno-error -Wno-incompatible-function-pointer-types -Wno-declaration-after-statement"
+            export KCFLAGS="-w -Wno-error"
           
           aosp-gcc: true
           aosp-clang: true
