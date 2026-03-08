@@ -1,6 +1,6 @@
 name: Build Poco F1 Docker Kernel
 on:
-  workflow_dispatch: # Allows manual trigger from the 'Actions' tab
+  workflow_dispatch:
 
 jobs:
   build:
@@ -16,24 +16,25 @@ jobs:
     - name: Build Kernel
       uses: dabao1955/kernel_build_action@main
       with:
-          # Change YOUR_USERNAME to your GitHub name
+          # Replace 'YOUR_USERNAME' with your GitHub username
           kernel-url: https://github.com/asif410/android_kernel_xiaomi_sdm845
-          kernel-dir: beryllium_kernel
+          kernel-dir: kernel
           kernel-branch: 16.0-bpf
           config: vendor/beryllium_defconfig
           arch: arm64
           
-          # Clang r522817 is standard for Android 15/16-ready kernels
+          # Enable BOTH Clang and GCC (Required for SDM845)
+          aosp-gcc: true
           aosp-clang: true
-          aosp-clang-version: r522817
-          android-version: 15
           
-          # Optimizations
+          # Use modern versions compatible with Android 16 ROMs
+          android-version: 15
+          aosp-clang-version: r522817
+          
+          # These flags help with Docker's BPF requirements
           disable-lto: false
           
-          # Output format
+          # Output and Root
           anykernel3: true
-          
-          # Root Access
           ksu: true
           ksu-version: main
