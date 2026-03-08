@@ -20,7 +20,7 @@ jobs:
           kernel-url: https://github.com/asif410/android_kernel_xiaomi_sdm845
           kernel-dir: kernel
           kernel-branch: 16.0-bpf
-          config: vendor/beryllium_defconfig
+          config: vendor/xiaomi/beryllium.config
           arch: arm64
           
           # Enable BOTH Clang and GCC (Required for SDM845)
