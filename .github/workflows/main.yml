@@ -1,45 +1,39 @@
-name: CI
+name: Build Poco F1 Docker Kernel
 on:
-  push:
-    branches: main
-    paths:
-      - '.github/workflows/main.yml'
-      - 'action.yml'
-      - 'src/*.ts'
-      - 'package.json'
-
-  pull_request:
-  workflow_dispatch:
+  workflow_dispatch: # Allows manual trigger from the 'Actions' tab
 
 jobs:
-  ci-test:
+  build:
     name: Build Kernel
-    strategy:
-      fail-fast: false
     runs-on: ubuntu-latest
     permissions:
       contents: write
 
     steps:
-    - name: Checkout
-      uses: actions/checkout@v6
-      with:
-          repository: ${{ github.event.pull_request.head.repo.full_name }}
-          ref: ${{ github.event.pull_request.head.ref }}
+    - name: Checkout Builder
+      uses: actions/checkout@v4
 
     - name: Build Kernel
-      uses: ./
+      uses: dabao1955/kernel_build_action@main
       with:
-          kernel-url: https://github.com/AcmeUI-Devices/android_kernel_xiaomi_cas
-          kernel-dir: msm-4.19
-          kernel-branch: taffy
-          config: cas_defconfig
+          # Change YOUR_USERNAME to your GitHub name
+          kernel-url: https://github.com/YOUR_USERNAME/android_kernel_xiaomi_sdm845
+          kernel-dir: beryllium_kernel
+          kernel-branch: 16.0-bpf
+          config: vendor/beryllium_defconfig
           arch: arm64
-          aosp-gcc: true
+          
+          # Clang r522817 is standard for Android 15/16-ready kernels
           aosp-clang: true
+          aosp-clang-version: r522817
+          android-version: 15
+          
+          # Optimizations
+          disable-lto: false
+          
+          # Output format
+          anykernel3: true
+          
+          # Root Access
           ksu: true
           ksu-version: main
-          android-version: 12
-          aosp-clang-version: r383902
-          disable-lto: true
-          anykernel3: true
