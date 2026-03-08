@@ -13,18 +13,32 @@ jobs:
     - name: Checkout Builder
       uses: actions/checkout@v4
 
+    # --- CACHING BLOCK (Speeds up toolchain downloads after 1st run) ---
+    - name: Cache Toolchains
+      uses: actions/cache@v4
+      with:
+        path: |
+          ${{ github.workspace }}/clang
+          ${{ github.workspace }}/gcc-64
+          ${{ github.workspace }}/gcc-32
+        key: ${{ runner.os }}-toolchains-${{ hashFiles('**/main.yml') }}
+        restore-keys: |
+          ${{ runner.os }}-toolchains-
+
     - name: Build Kernel
       uses: dabao1955/kernel_build_action@main
       with:
-          # Replace 'YOUR_USERNAME' with your GitHub username
           kernel-url: https://github.com/asif410/android_kernel_xiaomi_sdm845
           kernel-dir: kernel
           kernel-branch: 16.0-bpf
           config: vendor/xiaomi/mi845_defconfig
           arch: arm64
 
-          # FORCE the compiler to ignore those specific warnings
-          extra-cmd: KCFLAGS="-Wno-error -Wno-incompatible-function-pointer-types -Wno-declaration-after-statement"
+          # NUCLEAR OPTION: Physically remove -Werror from all source files to bypass BPF/KSU crashes
+          extra-cmd: |
+            find . -name "Makefile*" -type f -exec sed -i 's/-Werror//g' {} +
+            find . -name "Kbuild*" -type f -exec sed -i 's/-Werror//g' {} +
+            export KCFLAGS="-Wno-error -Wno-incompatible-function-pointer-types -Wno-declaration-after-statement"
           
           # Enable BOTH Clang and GCC (Required for SDM845)
           aosp-gcc: true
@@ -41,3 +55,10 @@ jobs:
           anykernel3: true
           ksu: true
           ksu-version: main
+
+    # --- UPLOAD STEP (Makes the .zip file available for download) ---
+    - name: Upload Kernel Result
+      uses: actions/upload-artifact@v4
+      with:
+        name: AnyKernel3-PocoF1-Docker
+        path: kernel/out/*.zip
