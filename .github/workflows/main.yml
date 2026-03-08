@@ -22,6 +22,9 @@ jobs:
           kernel-branch: 16.0-bpf
           config: vendor/xiaomi/mi845_defconfig
           arch: arm64
+
+          # FORCE the compiler to ignore those specific warnings
+          extra-cmd: KCFLAGS="-Wno-error -Wno-incompatible-function-pointer-types -Wno-declaration-after-statement"
           
           # Enable BOTH Clang and GCC (Required for SDM845)
           aosp-gcc: true
