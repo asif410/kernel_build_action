@@ -28,7 +28,7 @@ jobs:
           aosp-clang: true
           
           # Use modern versions compatible with Android 16 ROMs
-          android-version: 15
+          android-version: 12
           aosp-clang-version: r522817
           
           # These flags help with Docker's BPF requirements
